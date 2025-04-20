@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Logowanie</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #eef0f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background-color: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .login-box h2 {
+      margin: 0;
+      text-align: center;
+      font-size: 22px;
+      color: #333;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 14px;
+      color: #333;
+    }
+
+    .input-group input {
+      padding: 10px 12px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+    }
+
+    .reset-link {
+      font-size: 13px;
+      text-align: right;
+      margin-top: -5px;
+    }
+
+    .reset-link a {
+      color: #444;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .reset-link a:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn {
+      padding: 12px;
+      background-color: #444;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background-color: #333;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .close-btn {
+      margin-top: 15px;
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      background-color: #222;
+    }
+
+  </style>
+</head>
+<body>
+  <form method="post" action="{% url 'login' %}" class="login-box">
+    {% csrf_token %}
+    <h2>Zaloguj się do komunikatora</h2>
+
+    {% if form.non_field_errors %}
+      <div class="error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="input-group">
+      <label for="id_username">Login</label>
+      {{ form.username }}
+    </div>
+
+    <div class="input-group"> 
+      <label for="id_password">Hasło</label>
+      {{ form.password }}
+    </div>
+
+    <div class="reset-link">
+      <a id="helpLink">Pomoc techniczna</a>
+    </div>
+
+    <button class="login-btn" type="submit">Zaloguj się</button>
+  </form>
+
+  <!-- Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <p>W celu założenia konta bądź zresetowania hasła skontaktuj się z administratorem IT Twojej firmy.</p>
+      <button class="close-btn" onclick="closeModal()">Zamknij</button>
+    </div>
+  </div>
+
+  <script>
+    const helpLink = document.getElementById('helpLink');
+    const helpModal = document.getElementById('helpModal');
+
+    helpLink.addEventListener('click', () => {
+      helpModal.style.display = 'flex';
+    });
+
+    function closeModal() {
+      helpModal.style.display = 'none';
+    }
+
+    window.addEventListener('click', (e) => {
+      if (e.target === helpModal) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

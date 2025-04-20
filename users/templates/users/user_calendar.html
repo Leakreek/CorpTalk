@@ -1,0 +1,267 @@
+<!-- users/user_calendar.html -->
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Kalendarz wydarzeń</title>
+  <style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #eef0f3;
+      }
+      .container {
+        display: flex;
+        height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+  
+      .sidebar {
+        width: 300px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+  
+      .top-section {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+  
+      .profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+  
+      .profile-pic {
+        width: 60px;
+        height: 60px;
+        background-color: #ccc;
+        border-radius: 50%;
+        position: relative;
+      }
+  
+      .status-dot {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 12px;
+        height: 12px;
+        background-color: green;
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+  
+      .user-info h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+  
+      .status {
+        color: green;
+        font-size: 14px;
+      }
+  
+      .role {
+        font-size: 14px;
+        color: #444;
+      }
+  
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+      }
+  
+      .buttons button, .logout-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        cursor: pointer;
+        box-sizing: border-box;
+        text-align: center;
+        display: block;
+        color: #ffffff;
+        background-color: #444;
+      }
+  
+      .buttons button:hover, .logout-btn:hover {
+        background-color: #ccc;
+      }
+  
+         .buttons button.active {
+        background-color: #fff;
+        color: #000;
+        cursor: default;
+        border: 2px solid #000;
+      }
+  
+      .logout-btn {
+        background-color: #f44336;
+        color: white;
+        margin-top: 30px;
+      }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+      overflow-y: auto;
+    }
+
+    .calendar h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .calendar-nav a {
+      padding: 8px 15px;
+      font-size: 14px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      background-color: #444;
+      color: white;
+      text-decoration: none;
+    }
+
+    .calendar-nav a:hover {
+      background-color: #888;
+    }
+
+    .calendar-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .calendar-column {
+      flex: 1 1 45%;
+    }
+
+    .day-entry {
+      margin-bottom: 12px;
+      padding: 10px 15px;
+      border-bottom: 1px solid #ddd;
+      background-color: #f9f9f9;
+      border-radius: 6px;
+    }
+
+    .event {
+      font-size: 14px;
+      color: #333;
+      padding-left: 10px;
+    }
+
+    .no-events {
+      font-size: 14px;
+      color: #999;
+      padding-left: 10px;
+    }
+
+    .status-dot.green { background-color: green; }
+    .status-dot.orange { background-color: orange; }
+    .status-dot.gray { background-color: gray; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="top-section">
+        <div class="profile">
+          <div class="profile-pic">
+            <div class="status-dot {% if request.user.status == 'available' %}green{% elif request.user.status == 'busy' %}orange{% else %}gray{% endif %}"></div>
+          </div>
+          <div class="user-info">
+            <h2>{{ request.user.get_full_name }}</h2>
+            <div class="role">{{ request.user.get_rola_display }}</div>
+          </div>
+        </div>
+
+        <form method="post" action="{% url 'change_status' %}" style="margin-top: 10px;">
+          {% csrf_token %}
+          <select name="status" onchange="this.form.submit()" style="width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; border: 1px solid #aaa;">
+            <option value="available" {% if request.user.status == 'available' %}selected{% endif %}>Dostępny</option>
+            <option value="busy" {% if request.user.status == 'busy' %}selected{% endif %}>Zajęty</option>
+            <option value="offline" {% if request.user.status == 'offline' %}selected{% endif %}>Niedostępny</option>
+          </select>
+        </form>
+
+        <div class="buttons">
+          <a href="{% url 'messages' %}"><button>Moje konwersacje</button></a>
+          <a href="{% url 'user_list' %}"><button>Lista pracowników</button></a>
+          <a href="{% url 'user_raport' %}"><button>Zobacz raport</button></a>
+          <a href="{% url 'user_calendar' %}"><button class="active">Kalendarz wydarzeń</button></a>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="logout-btn">Wyloguj</button>
+      </form>
+    </div>
+
+    <!-- MAIN CALENDAR -->
+    <div class="main">
+      <div class="calendar">
+        <h1>Kalendarz wydarzeń – {{ month|stringformat:"02d" }}/{{ year }}</h1>
+
+        <div class="calendar-nav">
+          <a href="?month={{ month|add:"-1" }}&year={{ year }}">← Poprzedni</a>
+          <a href="?month={{ month|add:"1" }}&year={{ year }}">Następny →</a>
+        </div>
+
+        <div class="calendar-grid">
+          <div class="calendar-column">
+            {% for day in calendar_days|slice:":15" %}
+              <div class="day-entry">
+                <strong>{{ day.day|stringformat:"02d" }}.{{ month|stringformat:"02d" }}</strong><br>
+                {% if day.events %}
+                  {% for event in day.events %}
+                    <div class="event">{{ event.title }} – {{ event.description }}</div>
+                  {% endfor %}
+                {% else %}
+                  <div class="no-events">Brak wydarzeń</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          <div class="calendar-column">
+            {% for day in calendar_days|slice:"15:" %}
+              <div class="day-entry">
+                <strong>{{ day.day|stringformat:"02d" }}.{{ month|stringformat:"02d" }}</strong><br>
+                {% if day.events %}
+                  {% for event in day.events %}
+                    <div class="event">{{ event.title }} – {{ event.description }}</div>
+                  {% endfor %}
+                {% else %}
+                  <div class="no-events">Brak wydarzeń</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

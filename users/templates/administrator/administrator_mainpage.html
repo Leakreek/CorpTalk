@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel administratora</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #eef0f3;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar {
+      width: 300px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px 0 0 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-pic {
+      width: 60px;
+      height: 60px;
+      background-color: #ccc;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 12px;
+      height: 12px;
+      background-color: green;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .user-info h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: green;
+    }
+
+    .role {
+      font-size: 14px;
+      color: #444;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .buttons a {
+      width: 100%;
+    }
+    
+    .buttons a button,
+    .logout-btn {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      cursor: pointer;
+      box-sizing: border-box;
+      text-align: center;
+      display: block;
+      color: #ffffff;
+      background-color: #444;
+
+    }
+
+    .buttons a button:hover,
+    .logout-btn:hover {
+      background-color: #ccc;
+    }
+
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      margin-top: auto;
+    }
+
+    .main {
+      flex: 1;
+      padding: 40px;
+    }
+
+    .main h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .main p {
+      font-size: 16px;
+      color: #444;
+    }
+
+    form {
+      margin-top: auto;
+    }
+    .status-dot.green {
+      background-color: green;
+    }
+    
+    .status-dot.orange {
+      background-color: orange;
+    }
+    
+    .status-dot.gray {
+      background-color: gray;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="top-section">
+        <div class="profile">
+          <div class="profile-pic">
+            <div class="status-dot {% if request.user.status == 'available' %}green{% elif request.user.status == 'busy' %}orange{% else %}gray{% endif %}"></div>
+          </div>
+          <div class="user-info">
+            <h2>{{ request.user.get_full_name }}</h2>
+            <div class="role">{{ request.user.get_rola_display }}</div>
+          </div>
+        </div>
+
+        <!-- ZMIANA STATUSU -->
+        <form id="statusForm" method="post" action="{% url 'change_status' %}" style="margin-top: 10px;">
+          {% csrf_token %}
+          <select name="status" id="statusSelect" style="width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; border: 1px solid #aaa;">
+            <option value="available" {% if request.user.status == 'available' %}selected{% endif %}>Dostępny</option>
+            <option value="busy" {% if request.user.status == 'busy' %}selected{% endif %}>Zajęty</option>
+            <option value="offline" {% if request.user.status == 'offline' %}selected{% endif %}>Niedostępny</option>
+          </select>
+        </form>
+
+        <div class="buttons">
+          <a href="/administrator/adduser/"><button>Dodaj użytkownika</button></a>
+          <a href="/administrator/edituser/"><button>Zarządzaj użytkownikami</button></a>
+          <a href="{% url 'messages' %}"><button>Moje konwersacje</button></a>
+          <a href="/administrator/raport/"><button>Przeglądaj raporty</button></a>
+          <a href="{% url 'calendar' %}"><button>Kalendarz</button></a>
+
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="logout-btn" type="submit">Wyloguj</button>
+      </form>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <h1>Witaj w panelu administratora</h1>
+      <p>Wybierz jedną z opcji po lewej stronie, aby zarządzać użytkownikami lub sprawdzić raporty.</p>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const ws = new WebSocket("ws://" + window.location.host + "/ws/status/");
+    const user = "{{ request.user.username }}";
+
+    ws.onopen = () => {
+      const statusSelect = document.getElementById("statusSelect");
+      if (statusSelect) {
+        // Wyślij status po wejściu
+        ws.send(JSON.stringify({
+          user: user,
+          status: statusSelect.value
+        }));
+
+        statusSelect.addEventListener("change", function () {
+          const newStatus = this.value;
+
+          // 1. Wyślij WebSocketem
+          ws.send(JSON.stringify({
+            user: user,
+            status: newStatus
+          }));
+
+          // 2. Zapisz do bazy przez POST
+          const form = document.getElementById("statusForm");
+          fetch(form.action, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": "{{ csrf_token }}",
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `status=${newStatus}`
+          });
+        });
+      }
+    };
+
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      console.log("Status update:", data.user, data.status);
+    };
+  </script>
+</body>
+</html>

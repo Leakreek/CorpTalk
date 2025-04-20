@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Raporty użytkowników</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #eef0f3;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar {
+      width: 300px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-pic {
+      width: 60px;
+      height: 60px;
+      background-color: #ccc;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 12px;
+      height: 12px;
+      background-color: green;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .user-info h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: green;
+    }
+
+    .role {
+      font-size: 14px;
+      color: #444;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .buttons button, .logout-btn {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      cursor: pointer;
+      box-sizing: border-box;
+      text-align: center;
+      display: block;
+      color: #ffffff;
+      background-color: #444;
+    }
+
+    .buttons button:hover, .logout-btn:hover {
+      background-color: #ccc;
+    }
+
+    .buttons button.active {
+      background-color: #fff;
+      color: #000;
+      cursor: default;
+      border: 2px solid #000;
+    }
+
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      margin-top: 30px;
+    }
+
+    .report-area {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .main h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .user-card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .user-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-info-block {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-info-block .profile-pic {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #ccc;
+      position: relative;
+    }
+
+    .user-info-block b {
+      font-size: 16px;
+    }
+
+    .user-info-block p {
+      margin: 0;
+      font-size: 13px;
+      color: #555;
+    }
+    .letter-heading {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .user-top button {
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .user-top button:hover {
+      background-color: #45a045;
+    }
+
+    .raport-section {
+      margin-top: 20px;
+      padding-left: 15px;
+    }
+
+    .raport-section p {
+      font-size: 15px;
+      margin: 5px 0;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #333;
+    }
+    .status-dot.green {
+      background-color: green;
+    }
+    
+    .status-dot.orange {
+      background-color: orange;
+    }
+    
+    .status-dot.gray {
+      background-color: gray;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- SIDEBAR ADMINA -->
+    <div class="sidebar">
+      <div class="top-section">
+        <div class="profile">
+          <div class="profile-pic">
+            <div class="status-dot {% if request.user.status == 'available' %}green{% elif request.user.status == 'busy' %}orange{% else %}gray{% endif %}"></div>
+          </div>
+          <div class="user-info">
+            <h2>{{ request.user.get_full_name }}</h2>
+            <div class="role">{{ request.user.get_rola_display }}</div>
+          </div>
+        </div>
+
+        <!-- ZMIANA STATUSU -->
+        <form id="statusForm" method="post" action="{% url 'change_status' %}" style="margin-top: 10px;">
+          {% csrf_token %}
+          <select id="statusSelect" name="status" style="width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; border: 1px solid #aaa;">
+            <option value="available" {% if request.user.status == 'available' %}selected{% endif %}>Dostępny</option>
+            <option value="busy" {% if request.user.status == 'busy' %}selected{% endif %}>Zajęty</option>
+            <option value="offline" {% if request.user.status == 'offline' %}selected{% endif %}>Niedostępny</option>
+          </select>
+        </form>
+
+        <div class="buttons">
+          <a href="/administrator/adduser/"><button>Dodaj użytkownika</button></a>
+          <a href="/administrator/edituser/"><button>Zarządzaj użytkownikami</button></a>
+          <a href="{% url 'messages' %}"><button>Moje konwersacje</button></a>
+          <a href="/administrator/raport/"><button class="active">Przeglądaj raporty</button></a>
+          <a href="{% url 'calendar' %}"><button>Kalendarz</button></a>
+
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="logout-btn" type="submit">Wyloguj</button>
+      </form>
+    </div>
+
+<!-- RAPORTY -->
+<div class="report-area" style="flex: 1; padding: 40px;">
+  <h1>Raporty użytkowników</h1>
+
+  {% regroup user_data by last_name_letter as grouped_user_data %}
+
+  {% for group in grouped_user_data %}
+    <div class="letter-heading">{{ group.grouper }}</div>
+
+    {% for data in group.list %}
+      <div class="user-card" style="background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 6px rgba(0,0,0,0.05);">
+        <div class="user-top" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="user-info-block" style="display: flex; align-items: center; gap: 10px;">
+            <div class="profile-pic" style="width: 50px; height: 50px; background: #ccc; border-radius: 50%;">
+              <div class="status-dot 
+                {% if data.user.status == 'available' %}green
+                {% elif data.user.status == 'busy' %}orange
+                {% else %}gray
+                {% endif %}" data-username="{{ data.user.username }}">
+              </div>
+            </div>
+            <div>
+              <b>{{ data.user.get_full_name }}</b>
+              <p style="margin: 0; color: #555;">{{ data.user.get_rola_display }}</p>
+            </div>
+          </div>
+          <button onclick="toggleReport('{{ data.user.username }}')" style="padding: 8px 12px; font-size: 14px; border: none; border-radius: 5px; background-color: #4caf50; color: white; cursor: pointer;">
+            Zobacz raport
+          </button>
+        </div>
+
+        <div class="raport-section" id="report-{{ data.user.username }}" style="display: none; margin-top: 15px;">
+          <p><strong>Łącznie przepracowano:</strong></p>
+          <p><span class="highlight">{{ data.duration.days }}</span> dni</p>
+          <p><span class="highlight">{{ data.hours }}</span> godzin</p>
+          <p><span class="highlight">{{ data.minutes }}</span> minut</p>
+
+          <hr style="margin: 20px 0;">
+
+          <h2 style="font-size: 18px;">Sesje pracy:</h2>
+          {% if data.sessions %}
+            <ul style="list-style: none; padding-left: 0;">
+              {% for session in data.sessions %}
+                <li style="margin-bottom: 8px;">
+                  <b>{{ session.login_time|date:"Y-m-d H:i" }}</b> – 
+                  {% if session.logout_time %}
+                    {{ session.logout_time|date:"Y-m-d H:i" }}
+                  {% else %}
+                    <i>aktualnie zalogowany</i>
+                  {% endif %}
+                  <span style="color: #666;"> | Czas: {{ session.duration }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Brak sesji do wyświetlenia.</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+
+
+<script>
+  // Jedna instancja WebSocket
+  const ws = new WebSocket("ws://" + window.location.host + "/ws/status/");
+  const user = "{{ request.user.username }}";
+
+  ws.onopen = () => {
+    const statusSelect = document.getElementById("statusSelect");
+    if (statusSelect) {
+      ws.send(JSON.stringify({ user: user, status: statusSelect.value }));
+
+      statusSelect.addEventListener("change", function () {
+        const newStatus = this.value;
+        ws.send(JSON.stringify({ user, status: newStatus }));
+
+        fetch(document.getElementById("statusForm").action, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: `status=${newStatus}`
+        });
+      });
+    }
+  };
+
+  ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    console.log("Status update:", data.user, data.status);
+  };
+
+  function toggleReport(username) {
+    const section = document.getElementById("report-" + username);
+    if (section.style.display === "none") {
+      section.style.display = "block";
+    } else {
+      section.style.display = "none";
+    }
+  }
+</script>
+</body>
+
+
+</html>

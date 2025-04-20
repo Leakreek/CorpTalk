@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CorpTalk</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #eef0f3;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .container {
+      margin-left: 10%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    h1 {
+      font-size: 168px;
+      color: #000;
+      margin: 0;
+      opacity: 0;
+      animation: slideInLeft 1.2s ease-out forwards;
+    }
+
+    h2 {
+      font-size: 28px;
+      color: #333;
+      margin-top: 20px;
+      margin-left: 2px;
+      opacity: 0;
+      animation: fadeIn 1s ease-out forwards;
+      animation-delay: 1.4s;
+    }
+
+    .login-btn {
+      margin-top: 70px;
+      padding: 26px 46px;
+      font-size: 20px;
+      background-color: #444;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out forwards;
+      animation-delay: 2.2s;
+      color: #ffffff;
+    }
+
+    .login-btn:hover {
+      background-color: #333;
+    }
+
+    @keyframes slideInLeft {
+      0% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CorpTalk</h1>
+    <h2>Rozmowy, które napędzają Twój biznes.</h2>
+    <button class="login-btn" onclick="window.location.href='/login'">Przejdź do logowania</button>
+  </div>
+</body>
+</html>

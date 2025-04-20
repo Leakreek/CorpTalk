@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Moje konwersacje</title>
+  <link rel="icon" href="sitelogo.ico" type="image/x-icon"> 
+   <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #eef0f3;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar {
+      width: 300px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-pic {
+      width: 60px;
+      height: 60px;
+      background-color: #ccc;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .status-dot {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 12px;
+      height: 12px;
+      background-color: green;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .status-dot.green { background-color: green; }
+    .status-dot.orange { background-color: orange; }
+    .status-dot.gray { background-color: gray; }
+
+    .user-info h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .status {
+      color: green;
+      font-size: 14px;
+    }
+
+    .role {
+      font-size: 14px;
+      color: #444;
+    }
+
+    .buttons button, .logout-btn, .back-btn {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+      color: #ffffff;
+      background-color: #444;
+    }
+
+    .back-btn {
+      background-color: #007bff;
+    }
+
+    .logout-btn {
+      background-color: #f44336;
+    }
+
+    .contacts {
+      width: 280px;
+      background-color: #fff;
+      padding: 20px;
+      margin: 0 5px;
+      border-radius: 8px;
+      overflow-y: auto;
+    }
+
+    .contact {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      text-decoration: none;
+      color: black;
+    }
+
+    .contact:hover {
+      background-color: #f5f5f5;
+    }
+
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+      border-radius: 8px;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 20px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .chat-header .profile-pic {
+      width: 50px;
+      height: 50px;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 60%;
+      padding: 10px;
+      border-radius: 20px;
+      background-color: #f5f5f5;
+      position: relative;
+    }
+
+    .message.left { align-self: flex-start; }
+    .message.right {
+      align-self: flex-end;
+      background-color: #d1e7dd;
+    }
+
+    .timestamp {
+      font-size: 11px;
+      color: #777;
+      margin-top: 4px;
+      width: 100%;
+      display: block;
+      text-align: right;
+    }
+
+    .message.left .timestamp {
+      text-align: left;
+    }
+
+    .input-bar {
+      display: flex;
+      gap: 10px;
+      padding: 10px 20px;
+      border-top: 1px solid #ccc;
+    }
+
+    .input-bar input {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+
+    .input-bar button {
+      padding: 10px 20px;
+      font-size: 14px;
+      background-color: #ddd;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .input-bar button:hover {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+<div class="container">
+
+  <!-- PANEL LEWY -->
+  <div class="sidebar">
+    <div class="top-section">
+      <div class="profile">
+        <div class="profile-pic">
+          <div class="status-dot {% if request.user.status == 'available' %}green{% elif request.user.status == 'busy' %}orange{% else %}gray{% endif %}"></div>
+        </div>
+        <div class="user-info">
+          <h2>{{ request.user.get_full_name }}</h2>
+          <div class="role">{{ request.user.get_rola_display }}</div>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'change_status' %}" style="margin-top: 10px;">
+        {% csrf_token %}
+        <select name="status" onchange="this.form.submit()" style="width: 100%; padding: 10px; font-size: 15px; border-radius: 5px; border: 1px solid #aaa;">
+          <option value="available" {% if request.user.status == 'available' %}selected{% endif %}>Dostępny</option>
+          <option value="busy" {% if request.user.status == 'busy' %}selected{% endif %}>Zajęty</option>
+          <option value="offline" {% if request.user.status == 'offline' %}selected{% endif %}>Niedostępny</option>
+        </select>
+      </form>
+
+      <p style="font-size: 17px; color: #555; margin-top: 10px;">
+        Jesteś teraz w widoku komunikatora.<br>
+        Naciśnij przycisk, by wrócić do strony głównej.
+      </p>
+      <a href="{{ return_url }}"><button class="btn back-btn">Powrót do strony głównej</button></a>
+    </div>
+
+    <form method="post" action="{% url 'logout' %}" style="margin-top: 120px;">
+      {% csrf_token %}
+      <button class="btn logout-btn" type="submit">Wyloguj</button>
+    </form>
+  </div>
+
+  <!-- LISTA UŻYTKOWNIKÓW -->
+  <div class="contacts">
+    <input type="text" placeholder="🔍 Szukaj">
+    <h4>Ostatnie rozmowy</h4>
+    {% for user in recent_users %}
+      <a href="?user={{ user.username }}" class="contact">
+        <div class="profile-pic">
+          <div class="status-dot {% if user.status == 'available' %}green{% elif user.status == 'busy' %}orange{% else %}gray{% endif %}" data-user="{{ user.username }}"></div>
+        </div>
+        <div>
+          <b>{{ user.get_full_name }}</b><br>
+          <span style="font-size: 13px;">{{ user.get_rola_display }}</span><br>
+          {% if user.unread_count > 0 %}
+            <span style="background-color: red; color: white; padding: 2px 6px; border-radius: 12px; font-size: 12px;">
+              {{ user.unread_count }}
+            </span>
+          {% endif %}
+        </div>
+      </a>
+    {% empty %}
+      <p>Brak konwersacji</p>
+    {% endfor %}
+
+    <hr style="margin: 15px 0;">
+    <h4>Wszyscy użytkownicy</h4>
+    {% for user in all_users %}
+      <a href="?user={{ user.username }}" class="contact">
+        <div class="profile-pic">
+          <div class="status-dot {% if user.status == 'available' %}green{% elif user.status == 'busy' %}orange{% else %}gray{% endif %}" data-user="{{ user.username }}"></div>
+        </div>
+        <div>
+          <b>{{ user.get_full_name }}</b><br>
+          <span style="font-size: 13px;">{{ user.get_rola_display }}</span><br>
+          {% if user.unread_count > 0 %}
+            <span style="background-color: red; color: white; padding: 2px 6px; border-radius: 12px; font-size: 12px;">
+              {{ user.unread_count }}
+            </span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- OKNO CZATU -->
+  <div class="chat">
+    {% if selected_user %}
+      <div class="chat-header">
+        <div class="profile-pic">
+          <div class="status-dot {% if selected_user.status == 'available' %}green{% elif selected_user.status == 'busy' %}orange{% else %}gray{% endif %}"></div>
+        </div>
+        <div class="chat-user-info">                                
+          <b>{{ selected_user.get_full_name }}</b><br>
+          <span style="font-size: 13px;">{{ selected_user.get_rola_display }}</span>
+          {% if selected_user.unread_count > 0 %}
+            <span class="unread-badge">{{ selected_user.unread_count }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="messages"></div>  
+
+      <form method="post" action="{% url 'send_message' %}?user={{ selected_user.username }}" class="input-bar">
+        {% csrf_token %}
+        <input type="hidden" name="receiver" value="{{ selected_user.username }}">
+        <input type="text" name="message" placeholder="Wpisz wiadomość..." required>
+        <button type="submit">Wyślij</button>
+      </form>
+    {% else %}
+      <div style="margin: auto; font-size: 20px; text-align: center;">
+        <strong>Wybierz rozmówcę z listy po lewej stronie</strong>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+  <script>
+    const selectedUser = "{{ selected_user.username|default_if_none:'' }}";
+    const csrfToken = "{{ csrf_token }}";
+  
+    function fetchMessages() {
+      if (!selectedUser) return;
+    
+      fetch(`/messages/ajax/?user=${selectedUser}`)
+        .then(response => response.json())
+        .then(data => {
+          const messagesContainer = document.querySelector(".messages");
+          messagesContainer.innerHTML = "";
+    
+          data.forEach(msg => {
+            const messageEl = document.createElement("div");
+            messageEl.classList.add("message");
+            messageEl.dataset.id = msg.id;
+    
+            if (msg.sender === "{{ request.user.username }}") {
+              messageEl.classList.add("right");
+    
+              // Dodaj kliknięcie tylko do swoich wiadomości
+              messageEl.addEventListener("click", () => {
+                const confirmed = confirm("Czy na pewno chcesz usunąć tę wiadomość?");
+                if (confirmed) {
+                  fetch(`/messages/delete/${msg.id}/`, {
+                    method: "POST",
+                    headers: {
+                      "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.status === "success") {
+                      messageEl.remove();
+                    }
+                  });
+                }
+              });
+    
+            } else {
+              messageEl.classList.add("left");
+            }
+    
+            messageEl.innerHTML = `
+              ${msg.content}
+              <div class="timestamp">${msg.timestamp}</div>
+            `;
+            messagesContainer.appendChild(messageEl);
+          });
+    
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+    }
+    
+  
+    function attachDeleteHandlers() {
+      document.querySelectorAll(".message.right").forEach(messageEl => {
+        messageEl.onclick = () => {
+          const id = messageEl.dataset.id;
+          if (confirm("Czy na pewno chcesz usunąć tę wiadomość?")) {
+            fetch(`/messages/delete/${id}/`, {
+              method: "POST",
+              headers: {
+                "X-CSRFToken": csrfToken
+              }
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.status === "success") {
+                messageEl.remove();
+              }
+            });
+          }
+        };
+      });
+    }
+  
+    function setupSendMessage() {
+      const form = document.querySelector(".input-bar");
+      if (!form) return;
+  
+      form.onsubmit = function(e) {
+        e.preventDefault();
+  
+        const input = this.querySelector("input[name='message']");
+        const receiver = this.querySelector("input[name='receiver']").value;
+        const content = input.value;
+  
+        if (!content.trim()) return;
+  
+        fetch(`/messages/send/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken
+          },
+          body: new URLSearchParams({
+            receiver: receiver,
+            message: content
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          input.value = "";
+          fetchMessages(); // tylko odświeżenie wiadomości
+        });
+      };
+    }
+  
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchMessages();
+      setupSendMessage();
+      setInterval(fetchMessages, 1000); // co sekundę update
+    });
+    function updateStatuses() {
+      fetch("/status/json/")
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(user => {
+            const dots = document.querySelectorAll(`.status-dot[data-user="${user.username}"]`);
+            dots.forEach(dot => {
+              dot.classList.remove("green", "orange", "gray");
+              if (user.status === "available") dot.classList.add("green");
+              else if (user.status === "busy") dot.classList.add("orange");
+              else dot.classList.add("gray");
+            });
+  
+            const statusTexts = document.querySelectorAll(`.status-text[data-user="${user.username}"]`);
+            statusTexts.forEach(span => {
+              span.textContent = user.status.charAt(0).toUpperCase() + user.status.slice(1);
+            });
+          });
+        });
+    }
+  
+    setInterval(updateStatuses, 5000); // co 5 sekund
+    document.addEventListener("DOMContentLoaded", updateStatuses);
+  </script>
+  
+</body>
+
+
+</html>
