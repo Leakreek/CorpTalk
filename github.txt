@@ -1,0 +1,4 @@
+by coś zaktualizować otwierasz cmd
+git add . to wpisujesz to dodaje pliki wszystkie 
+git commit -m "Opis zmiany, np. Poprawki w widokach"
+git push  wyrzuca
