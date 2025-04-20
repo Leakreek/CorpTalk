@@ -27,3 +27,10 @@ Wejdź na stronę aplikacji
 Po kilku sekundach aplikacja będzie działać lokalnie:
 
 http://127.0.0.1:8000
+
+przykładowi użytkownicy jacy są dodani to (userów dodaje się przez zalogowanie się do admina i dodanie użytkownika):
+Login: user Hasło: user
+
+Login: admin Hasło: admin
+
+Login: secretariat Hasło: secretariat
