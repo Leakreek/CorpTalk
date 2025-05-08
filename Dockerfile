@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 6. Komenda uruchamiająca
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "corptalk.asgi:application"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "3000", "corptalk.asgi:application"]

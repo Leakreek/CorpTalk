@@ -25,10 +25,15 @@ SECRET_KEY = 'django-insecure-v_s!ya^)5o*p=romk&gqacc@o9v&#xd2%&f@!h=s$!=^(6rwxn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "corptalk.loca.lt"
+]
 
-
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://corptalk.loca.lt"
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -134,12 +139,13 @@ INSTALLED_APPS += [
 
 ASGI_APPLICATION = 'corptalk.asgi.application'  # zmień 'yourproject' na nazwę projektu
 
+import os
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [os.environ.get("REDIS_URL", "redis://redis:6379")],
         },
     },
 }
-

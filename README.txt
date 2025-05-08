@@ -1,4 +1,4 @@
-# CorpTalk króki opis cnie
+# CorpTalk – krótki opis cnie
 
 CorpTalk to wewnętrzna aplikacja komunikacyjna stworzona w Django, przeznaczona do użytku w firmie.
 
@@ -22,7 +22,6 @@ CorpTalk to wewnętrzna aplikacja komunikacyjna stworzona w Django, przeznaczona
   - Podgląd raportów pracowników
   - Podgląd i edycja kalendarza
 
-
 - **Użytkownik**
   - Dostęp do czatu i własnych konwersacji
   - Możliwość zmiany własnego statusu
@@ -36,33 +35,66 @@ CorpTalk to wewnętrzna aplikacja komunikacyjna stworzona w Django, przeznaczona
 - Daphne (ASGI server)
 - Docker + Docker Compose (do uruchamiania aplikacji)
 
+## Instrukcja uruchomienia aplikacji CorpTalk
+
+### Metoda 1 – Lokalnie przez Docker (localhost)
+
+1. Zainstaluj Docker Desktop
+
+2. Uruchom Docker Desktop (musi być włączony by aplikacja działała)
+
+3. Pobierz folder projektu CorpTalk z GitHuba
+
+4. Otwórz terminal w katalogu z projektem
+
+5. Uruchom aplikację (w katalogu z plikiem `docker-compose.yml`)(to się pisze tylko raz jak się buduje docker):
+
+   docker-compose up --build
+
+6. Jak docker to przemieli to można wejść na stronę pod linkiem:  
+   http://127.0.0.1:3000
+
+7. Żeby zamknąć serwer wystarczy kliknąć `CTRL+C` w konsoli z serwerem i wpisać:  
+   docker-compose down
+
+8. Żeby otworzyć ponownie serwer po zamknięciu wystarczy wpisać w terminalu:  
+   docker-compose up
+
+### Metoda 2 – Udostępnienie aplikacji przez internet (LocalTunnel)
+
+Ta metoda pozwala odpalić aplikację tak, by była dostępna online – np. do testowania z drugiego komputera na tel działa chujowo.
+
+1. Zainstaluj Node.js (jeśli nie masz) – https://nodejs.org
+
+2. Zainstaluj LocalTunnel globalnie:
+
+   npm install -g localtunnel
+
+3.Odpal dockera tak jak przy metodzie 1, w katalogu CorpTalk wpisz:
+
+   docker-compose up
+
+4. W nowym terminalu również w katalogu CorpTalk uruchom tunel:
+
+   lt --port 3000 --subdomain corptalk
+
+   Jeśli subdomena jest zajęta, wpisz inną, np.:
+
+   lt --port 3000 --subdomain corptalk123
+
+5. Pojawi się link, np.:  
+   https://corptalk.loca.lt
+
+   To jest publiczny link, który działa z każdego urządzenia z internetem.
 
 
-Instrukcja uruchomienia aplikacji CorpTalk (lokalnie przez Docker)
-Zainstaluj Docker Desktop
 
-    Uruchom Docker Desktop (musi być włączony by aplikacja działała)
+Uwaga: LocalTunnel może wyświetlić ekran z prośbą o potwierdzenie – to normalne. Wystarczy kliknąć "Submit".
 
-    Pobierz folder projektu CorpTalk z githuba
+## Przykładowi użytkownicy:
 
-    Otwórz terminal w katalogu z projektem
+(Użytkowników dodaje się przez zalogowanie się do admin panelu `/admin`)
 
-    Uruchom aplikację
-    W katalogu z plikiem docker-compose.yml, uruchom komendę:
-
-docker-compose up --build
-
-Jak docker to przemieli to można wejść na strone pod linkiem: 
-http://127.0.0.1:8000
-
-Żeby zamknąć serwer wystarczy kliknąć ctrl+c w konsoli z serwerem i wpisać komendę: docker-compose down
-
-Żeby otworzyć ponownie serwer po zamknięciu wystarczy wpisać w cmd w katalogu aplikacji: docker-compose up
-
-
-przykładowi użytkownicy jacy są dodani to (użytkowników dodaje się przez zalogowanie się do admina i dodanie użytkownika):
-Login: user Hasło: user
-
-Login: admin Hasło: admin
-
-Login: secretariat Hasło: secretariat
+Login: user   Hasło: user  
+Login: admin  Hasło: admin  
+Login: secretariat Hasło: secretariat
