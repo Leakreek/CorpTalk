@@ -341,7 +341,7 @@
             if (msg.sender === "{{ request.user.username }}") {
               messageEl.classList.add("right");
     
-              // Dodaj kliknięcie tylko do swoich wiadomości
+             
               messageEl.addEventListener("click", () => {
                 const confirmed = confirm("Czy na pewno chcesz usunąć tę wiadomość?");
                 if (confirmed) {
@@ -425,7 +425,7 @@
         .then(res => res.json())
         .then(data => {
           input.value = "";
-          fetchMessages(); // tylko odświeżenie wiadomości
+          fetchMessages(); 
         });
       };
     }

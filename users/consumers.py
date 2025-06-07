@@ -7,7 +7,6 @@ class StatusConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Nie zmieniamy statusu na 'offline' – to robi logout
         await self.channel_layer.group_discard("status_updates", self.channel_name)
 
     async def receive(self, text_data):

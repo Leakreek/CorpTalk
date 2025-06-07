@@ -1,4 +1,4 @@
-# CorpTalk – krótki opis cnie
+# CorpTalk – krótki opis
 
 CorpTalk to wewnętrzna aplikacja komunikacyjna stworzona w Django, przeznaczona do użytku w firmie.
 
@@ -47,11 +47,11 @@ CorpTalk to wewnętrzna aplikacja komunikacyjna stworzona w Django, przeznaczona
 
 4. Otwórz terminal w katalogu z projektem
 
-5. Uruchom aplikację (w katalogu z plikiem `docker-compose.yml`)(to się pisze tylko raz jak się buduje docker):
+5. Uruchom aplikację (w katalogu z plikiem `docker-compose.yml`):
 
    docker-compose up --build
 
-6. Jak docker to przemieli to można wejść na stronę pod linkiem:  
+6. Jak docker to przetworzy to można wejść na stronę pod linkiem:  
    http://127.0.0.1:3000
 
 7. Żeby zamknąć serwer wystarczy kliknąć `CTRL+C` w konsoli z serwerem i wpisać:  
@@ -62,9 +62,9 @@ CorpTalk to wewnętrzna aplikacja komunikacyjna stworzona w Django, przeznaczona
 
 ### Metoda 2 – Udostępnienie aplikacji przez internet (LocalTunnel)
 
-Ta metoda pozwala odpalić aplikację tak, by była dostępna online – np. do testowania z drugiego komputera na tel działa chujowo.
+Ta metoda pozwala odpalić aplikację tak, by była dostępna online – np. do testowania z drugiego komputera.
 
-1. Zainstaluj Node.js (jeśli nie masz) – https://nodejs.org
+1. Zainstaluj Node.js – https://nodejs.org
 
 2. Zainstaluj LocalTunnel globalnie:
 

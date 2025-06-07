@@ -532,7 +532,7 @@ def administrator_edituser(request):
             if password:
                 selected_user.set_password(password)
 
-            # ✅ Zapisz stan checkboxa aktywności
+            # Zapisz stan checkboxa aktywności
             selected_user.is_active = 'is_active' in request.POST
 
             selected_user.save()

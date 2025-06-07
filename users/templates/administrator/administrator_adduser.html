@@ -147,6 +147,12 @@
       flex-direction: column;
       gap: 15px;
     }
+    .buttons button.active {
+      background-color: #fff;
+      color: #000;
+      cursor: default;
+      border: 2px solid #000;
+    }
 
     .user-form input,
     .user-form select {
@@ -206,7 +212,7 @@
         </form>
 
         <div class="buttons">
-          <a href="/administrator/adduser/"><button>Dodaj użytkownika</button></a>
+          <a href="/administrator/adduser/"><button class="active">Dodaj użytkownika</button></a>
           <a href="/administrator/edituser/"><button>Zarządzaj użytkownikami</button></a>
           <a href="{% url 'messages' %}"><button>Moje konwersacje</button></a>
           <a href="/administrator/raport/"><button>Przeglądaj raporty</button></a>

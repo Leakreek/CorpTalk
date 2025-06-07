@@ -37,7 +37,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'users.apps.UsersConfig',  # <-- TYLKO to
+    'users.apps.UsersConfig',  
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 ]
 
 
-##LOGIN_REDIRECT_URL = '/'  # czyli niech od razu zadziała CustomLoginView
+##LOGIN_REDIRECT_URL = '/'  #
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -137,7 +137,7 @@ INSTALLED_APPS += [
     "channels",
 ]
 
-ASGI_APPLICATION = 'corptalk.asgi.application'  # zmień 'yourproject' na nazwę projektu
+ASGI_APPLICATION = 'corptalk.asgi.application'  
 
 import os
 

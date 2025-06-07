@@ -114,6 +114,12 @@
       color: white;
       margin-top: auto;
     }
+    .buttons button.active {
+      background-color: #fff;
+      color: #000;
+      cursor: default;
+      border: 2px solid #000;
+    }
 
     .main {
       flex: 1;
@@ -191,7 +197,7 @@
     
         <div class="buttons">
           <a href="/administrator/adduser/"><button>Dodaj użytkownika</button></a>
-          <a href="/administrator/edituser/"><button>Zarządzaj użytkownikami</button></a>
+          <a href="/administrator/edituser/"><button class="active">Zarządzaj użytkownikami</button></a>
           <a href="{% url 'messages' %}"><button>Moje konwersacje</button></a>
           <a href="/administrator/raport/"><button>Przeglądaj raporty</button></a>
           <a href="{% url 'calendar' %}"><button>Kalendarz</button></a>
